@@ -1,60 +1,66 @@
-import requests
-import gradio as gr
-import langchain
+from langchain.chat_models import AzureChatOpenAI
+from langchain.schema import AIMessage, HumanMessage
 import os
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+import openai
+import gradio as gr
 import logging
+import json
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+
+openai.api_type = "azure"
+openai.api_version = "2023-05-15"
+openai.api_base = os.getenv("OPENAI_API_BASE")
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+#log details
+openai.log='debug'
 
 def load_config():
     config = {
-        "n_threads": int(os.getenv("n_threads", 2)),
-        "n_batch": int(os.getenv("n_batch", 512)),
-        "n_gpu_layers": int(os.getenv("n_gpu_layers", 40)),
-        "n_ctx": int(os.getenv("n_ctx", 4096)),
-        "title": os.getenv("title", "🦜🔗 Chatbot LLama2 on Kubernetes with GPU"),
-        "description": os.getenv("description", "Chatbot using LLama2 GPTQ model running on top of Kubernetes"),
+        "title": os.getenv("title", "Azure OpenAI App running in Azure Red Hat OpenShift"),
+        "description": os.getenv("description", "Azure OpenAI App running in Azure Red Hat OpenShift"),
         "port": int(os.getenv("port", 8080)),
-        "model_name_or_path": os.getenv("model_name_or_path", "TheBloke/Llama-2-13B-chat-GPTQ"),
-        "model_storage_path": os.getenv("model_storage_path", "/mnt/models"),
     }
     logging.info(f"Loaded configuration: {config}")
     return config
 
-def load_model(model_name_or_path):
+def load_model():
     try:
-        model = AutoModelForCausalLM.from_pretrained(model_name_or_path,
-                                                device_map="auto", # Auto-assign the device for computation
-                                                trust_remote_code=False,  # Do not trust remote code for security reasons
-                                                revision="main")# Use the specified branch (main in this case)
-        tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, use_fast=True)
-        return model, tokenizer
+        # Callbacks support token-wise streaming
+        callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+        logging.info(f"Preparing model")
+
+        # Loading model directly using the specified path
+        model = AzureChatOpenAI(
+            openai_api_base=openai.api_base,
+            openai_api_version="2023-05-15",
+            deployment_name="gpt-35-turbo",
+            openai_api_key=openai.api_key,
+            openai_api_type="azure",
+)
+        return model
     except Exception as e:
         logging.error(f"Error loading model: {str(e)}")
         raise
 
-def generate_response(prompt):
-    logging.info(f"Received prompt: {prompt}")
-
-    # Tokenize the combined prompt and convert it to tensor, then generate text using the model
-    input_ids = tokenizer(prompt, return_tensors='pt').input_ids.cuda()
-    output = model.generate(inputs=input_ids, 
-                            temperature=0.7, 
-                            do_sample=True, 
-                            top_p=0.95, 
-                            top_k=40, 
-                            max_new_tokens=512)
+def predict(message, history):
+    history_langchain_format = []
+    for human, ai in history:
+        history_langchain_format.append(HumanMessage(content=human))
+        history_langchain_format.append(AIMessage(content=ai))
+    history_langchain_format.append(HumanMessage(content=message))
     
-    # Decode the generated output tensor and return the generated text
-    generated_text = tokenizer.decode(output[0])
-    return generated_text
+    # Call Azure OpenAI API
+    azure_response = model(history_langchain_format)
+    
+    return azure_response.content
 
 # Define a run function that sets up an image and label for classification using the gr.Interface.
 def run(port):
     try:
         logging.info(f"Starting Gradio interface on port {port}...")
-        interface = gr.Interface(fn=generate_response, inputs=gr.Textbox(), outputs=gr.Textbox(),
-                     title=title, description=description, theme=gr.themes.Soft())
-        interface.launch(server_name="0.0.0.0",server_port=port, share=False)
+        gr.ChatInterface(fn=predict, theme=gr.themes.Soft()).launch(debug=True, share=False)
         logging.info("Gradio interface launched.")
 
     except Exception as e:
@@ -67,16 +73,11 @@ if __name__ == "__main__":
         config = load_config()
 
         # Extract configuration variables
-        model_name_or_path = config.get("model_name_or_path", "TheBloke/Llama-2-13B-chat-GPTQ")
-        n_gpu_layers = config.get("n_gpu_layers", 40)
-        n_batch = config.get("n_batch", 512)
-        n_ctx = config.get("n_ctx", 4096)
+        title = config.get("title", "Azure OpenAI App running in Azure Red Hat OpenShift")
+        description = config.get("description", "Azure OpenAI App running in Azure Red Hat OpenShift")
         port = config.get("port", 8080)
-        title = config.get("title", "🦜🔗 Chatbot LLama2 on Kubernetes on GPU")
-        description = config.get("description", "Chatbot using LLama2 GPQT model running on top of Kubernetes")
 
-        # Download and load the model
-        model, tokenizer = load_model(model_name_or_path)
+        load_model()
 
         # Execute Gradio App
         run(port)

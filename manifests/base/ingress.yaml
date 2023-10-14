@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: k8s-llama2-gpu-ingress
+  name: azureopenai-aro-ingress
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -12,6 +12,6 @@ spec:
             path: /
             backend:
               service:
-                name: k8s-llama2-gpu-svc
+                name: azureopenai-aro-svc
                 port:
                   number: 8080

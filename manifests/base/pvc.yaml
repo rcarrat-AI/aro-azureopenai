@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: k8s-llama2-gpu-pvc
+  name: azureopenai-aro-pvc
 spec:
   accessModes:
     - ReadWriteOnce

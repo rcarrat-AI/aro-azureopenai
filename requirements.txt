@@ -1,7 +1,5 @@
 gradio
-accelerate
 requests
+tensorflow
 langchain
-cmake
-bitsandbytes
-scipy
+openai
