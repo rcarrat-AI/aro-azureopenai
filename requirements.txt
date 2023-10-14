@@ -1,0 +1,7 @@
+gradio
+accelerate
+requests
+langchain
+cmake
+bitsandbytes
+scipy

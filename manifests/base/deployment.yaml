@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: k8s-llama2-gpu
+  name: k8s-llama2-gpu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-llama2-gpu
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: k8s-llama2-gpu
+    spec:
+      containers:
+        - image: quay.io/rcarrata/k8s-llama2-gpu:v1
+          name: k8s-llama2-gpu
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: model-storage
+              mountPath: /mnt/models
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          env: # Add this section to pass ConfigMap values as environment variables
+            - name: n_threads
+              valueFrom:
+                configMapKeyRef:
+                  name: llama2-config
+                  key: n_threads
+            - name: n_batch
+              valueFrom:
+                configMapKeyRef:
+                  name: llama2-config
+                  key: n_batch
+            - name: n_gpu_layers
+              valueFrom:
+                configMapKeyRef:
+                  name: llama2-config
+                  key: n_gpu_layers
+            - name: n_ctx
+              valueFrom:
+                configMapKeyRef:
+                  name: llama2-config
+                  key: n_ctx
+            - name: title
+              valueFrom:
+                configMapKeyRef:
+                  name: llama2-config
+                  key: title
+            - name: description
+              valueFrom:
+                configMapKeyRef:
+                  name: llama2-config
+                  key: description
+            - name: port
+              valueFrom:
+                configMapKeyRef:
+                  name: llama2-config
+                  key: port
+            - name: model_name_or_path
+              valueFrom:
+                configMapKeyRef:
+                  name: llama2-config
+                  key: model_name_or_path
+            - name: model_storage_path
+              valueFrom:
+                configMapKeyRef:
+                  name: llama2-config
+                  key: model_storage_path
+      volumes:
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName: k8s-llama2-gpu-pvc
