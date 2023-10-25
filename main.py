@@ -8,6 +8,8 @@ import json
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
+model = None
+
 openai.api_type = "azure"
 openai.api_version = "2023-05-15"
 openai.api_base = os.getenv("OPENAI_API_BASE")
@@ -26,11 +28,13 @@ def load_config():
     return config
 
 def load_model():
+    global model  # Declare that you are using the global model variable
     try:
         # Callbacks support token-wise streaming
         callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
         logging.info(f"Preparing model")
-
+        logging.info("API_BASE",openai.api_base)
+        logging.info("API_KEY",openai.api_key)
         # Loading model directly using the specified path
         model = AzureChatOpenAI(
             openai_api_base=openai.api_base,
@@ -38,22 +42,25 @@ def load_model():
             deployment_name="gpt-35-turbo",
             openai_api_key=openai.api_key,
             openai_api_type="azure",
-)
+        )
         return model
     except Exception as e:
         logging.error(f"Error loading model: {str(e)}")
         raise
 
 def predict(message, history):
+    global model
+    if model is None:
+        load_model()
     history_langchain_format = []
     for human, ai in history:
         history_langchain_format.append(HumanMessage(content=human))
         history_langchain_format.append(AIMessage(content=ai))
     history_langchain_format.append(HumanMessage(content=message))
-    
+
     # Call Azure OpenAI API
     azure_response = model(history_langchain_format)
-    
+
     return azure_response.content
 
 # Define a run function that sets up an image and label for classification using the gr.Interface.
