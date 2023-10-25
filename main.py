@@ -23,23 +23,22 @@ def load_config():
         "title": os.getenv("title", "Azure OpenAI App running in Azure Red Hat OpenShift"),
         "description": os.getenv("description", "Azure OpenAI App running in Azure Red Hat OpenShift"),
         "port": int(os.getenv("port", 8080)),
+        "deployment_name": os.getenv("deployment_name", "gpt-35-turbo"),
     }
     logging.info(f"Loaded configuration: {config}")
     return config
 
-def load_model():
+def load_model(deployment_name):
     global model  # Declare that you are using the global model variable
     try:
         # Callbacks support token-wise streaming
         callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
         logging.info(f"Preparing model")
-        logging.info("API_BASE",openai.api_base)
-        logging.info("API_KEY",openai.api_key)
         # Loading model directly using the specified path
         model = AzureChatOpenAI(
             openai_api_base=openai.api_base,
             openai_api_version="2023-05-15",
-            deployment_name="gpt-35-turbo",
+            deployment_name=deployment_name,
             openai_api_key=openai.api_key,
             openai_api_type="azure",
         )
@@ -60,7 +59,6 @@ def predict(message, history):
 
     # Call Azure OpenAI API
     azure_response = model(history_langchain_format)
-
     return azure_response.content
 
 # Define a run function that sets up an image and label for classification using the gr.Interface.
@@ -83,8 +81,9 @@ if __name__ == "__main__":
         title = config.get("title", "Azure OpenAI App running in Azure Red Hat OpenShift")
         description = config.get("description", "Azure OpenAI App running in Azure Red Hat OpenShift")
         port = config.get("port", 8080)
+        deployment_name = config.get("deployment_name", "gpt-35-turbo")
 
-        load_model()
+        load_model(deployment_name)
 
         # Execute Gradio App
         run(port)

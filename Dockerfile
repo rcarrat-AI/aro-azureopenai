@@ -1,21 +1,21 @@
-FROM python:3.9
+FROM registry.access.redhat.com/ubi8/python-39
 
-# Create a non-root user with specific user ID and group ID
-RUN groupadd -g 1001 appgroup && useradd -r -u 1001 -g appgroup -d /home/appuser -s /bin/bash appuser
+USER root
 
-WORKDIR /app
+RUN dnf -y update \
+  && dnf -y install python3-pip \
+  && dnf -y clean all \
+  && rm -rf /var/cache/dnf \
+  && pip install pip==22.3.1 setuptools==65.3.0
 
-COPY ./requirements.txt /app/requirements.txt
+USER 1001
 
-RUN mkdir -p /app && \
-  chown -R appuser:appgroup /app
+# Copy and install requirements
+COPY requirements.txt ./
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-USER appuser
+# Copy the application files
+COPY *.py ./
 
-RUN pip install --no-cache-dir -r /app/requirements.txt
-
-COPY main.py /app
-
-EXPOSE 7860
-
-CMD ["python", "main.py"]
+# Run the application
+CMD python3 main.py

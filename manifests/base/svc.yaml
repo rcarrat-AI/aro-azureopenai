@@ -2,14 +2,14 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: azureopenai-aro
-  name: azureopenai-aro-svc
+    app: aro-azureopenai
+  name: aro-azureopenai-svc
 spec:
   ports:
     - port: 8080
       protocol: TCP
       targetPort: 8080
   selector:
-    app: azureopenai-aro
+    app: aro-azureopenai
   sessionAffinity: None
   type: ClusterIP

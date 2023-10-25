@@ -3,28 +3,25 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: azureopenai-aro
-  name: azureopenai-aro
+    app: aro-azureopenai
+  name: aro-azureopenai
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: azureopenai-aro
+      app: aro-azureopenai
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: azureopenai-aro
+        app: aro-azureopenai
     spec:
       containers:
-        - image: quay.io/rcarrata/azureopenai-aro:v1
-          name: azureopenai-aro
+        - image: quay.io/rcarrata/aro-azureopenai:v1
+          name: aro-azureopenai
           ports:
             - containerPort: 8080
-          volumeMounts:
-            - name: model-storage
-              mountPath: /mnt/models
           readinessProbe:
             httpGet:
               path: /
@@ -38,26 +35,6 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 15
           env: # Add this section to pass ConfigMap values as environment variables
-            - name: n_threads
-              valueFrom:
-                configMapKeyRef:
-                  name: azureopenai-config
-                  key: n_threads
-            - name: n_batch
-              valueFrom:
-                configMapKeyRef:
-                  name: azureopenai-config
-                  key: n_batch
-            - name: n_gpu_layers
-              valueFrom:
-                configMapKeyRef:
-                  name: azureopenai-config
-                  key: n_gpu_layers
-            - name: n_ctx
-              valueFrom:
-                configMapKeyRef:
-                  name: azureopenai-config
-                  key: n_ctx
             - name: title
               valueFrom:
                 configMapKeyRef:
@@ -78,12 +55,3 @@ spec:
                 configMapKeyRef:
                   name: azureopenai-config
                   key: model_name_or_path
-            - name: model_storage_path
-              valueFrom:
-                configMapKeyRef:
-                  name: azureopenai-config
-                  key: model_storage_path
-      volumes:
-        - name: model-storage
-          persistentVolumeClaim:
-            claimName: azureopenai-pvc

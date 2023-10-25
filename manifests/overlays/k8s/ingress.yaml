@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: azureopenai-aro-ingress
+  name: aro-azureopenai-ingress
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -12,6 +12,6 @@ spec:
             path: /
             backend:
               service:
-                name: azureopenai-aro-svc
+                name: aro-azureopenai-svc
                 port:
                   number: 8080
