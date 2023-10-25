@@ -8,8 +8,10 @@ import json
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
+# Model Global Variable
 model = None
 
+# Only for development
 openai.api_type = "azure"
 openai.api_version = "2023-05-15"
 openai.api_base = os.getenv("OPENAI_API_BASE")
@@ -24,11 +26,14 @@ def load_config():
         "description": os.getenv("description", "Azure OpenAI App running in Azure Red Hat OpenShift"),
         "port": int(os.getenv("port", 8080)),
         "deployment_name": os.getenv("deployment_name", "gpt-35-turbo"),
+        "api_type": os.getenv("api_type", "azure"),
+        "api_version": os.getenv("api_version", "2023-05-15")
     }
     logging.info(f"Loaded configuration: {config}")
     return config
 
-def load_model(deployment_name):
+# Load the Azure OpenAI Model using LangChain
+def load_model(api_type, api_version, deployment_name):
     global model  # Declare that you are using the global model variable
     try:
         # Callbacks support token-wise streaming
@@ -37,10 +42,10 @@ def load_model(deployment_name):
         # Loading model directly using the specified path
         model = AzureChatOpenAI(
             openai_api_base=openai.api_base,
-            openai_api_version="2023-05-15",
+            openai_api_version=api_version,
             deployment_name=deployment_name,
             openai_api_key=openai.api_key,
-            openai_api_type="azure",
+            openai_api_type=api_type,
         )
         return model
     except Exception as e:
@@ -65,7 +70,19 @@ def predict(message, history):
 def run(port):
     try:
         logging.info(f"Starting Gradio interface on port {port}...")
-        gr.ChatInterface(fn=predict, theme=gr.themes.Soft()).launch(debug=True, share=False)
+        chat_interface = gr.ChatInterface(
+            fn=predict, 
+            theme=gr.themes.Soft(),
+            title=title,
+            description=description
+        )
+
+        chat_interface.launch(
+            debug=True, 
+            share=False, 
+            server_name="0.0.0.0", 
+            server_port=port
+        )
         logging.info("Gradio interface launched.")
 
     except Exception as e:
@@ -82,8 +99,11 @@ if __name__ == "__main__":
         description = config.get("description", "Azure OpenAI App running in Azure Red Hat OpenShift")
         port = config.get("port", 8080)
         deployment_name = config.get("deployment_name", "gpt-35-turbo")
+        api_type = config.get("api_type", "azure")
+        api_version = config.get("api_version", "2023-05-15")
 
-        load_model(deployment_name)
+        # Load the Azure OpenAI Model using LangChain
+        load_model(api_type, api_version, deployment_name)
 
         # Execute Gradio App
         run(port)

@@ -3,6 +3,6 @@ kind: Kustomization
 
 resources:
   - ingress.yaml
-  - ../base
+  - ../../base
 
 namespace: aro-azureopenai
