@@ -27,13 +27,15 @@ def load_config():
         "port": int(os.getenv("port", 8080)),
         "deployment_name": os.getenv("deployment_name", "gpt-35-turbo"),
         "api_type": os.getenv("api_type", "azure"),
-        "api_version": os.getenv("api_version", "2023-05-15")
+        "api_version": os.getenv("api_version", "2023-05-15"),
+        "api_base": os.getenv("api_base", "https://exampleapi.com"),
+        "api_key": os.getenv("api_key", "this_needs_to_be_replaced_with_azureopenai_key")
     }
     logging.info(f"Loaded configuration: {config}")
     return config
 
 # Load the Azure OpenAI Model using LangChain
-def load_model(api_type, api_version, deployment_name):
+def load_model(api_type, api_version, api_base, api_key, deployment_name):
     global model  # Declare that you are using the global model variable
     try:
         # Callbacks support token-wise streaming
@@ -101,9 +103,11 @@ if __name__ == "__main__":
         deployment_name = config.get("deployment_name", "gpt-35-turbo")
         api_type = config.get("api_type", "azure")
         api_version = config.get("api_version", "2023-05-15")
+        api_base =  config.get("api_base", "https://exampleapi.com"),
+        api_key = config.get("api_key", "this_needs_to_be_replaced_with_azureopenai_key")
 
         # Load the Azure OpenAI Model using LangChain
-        load_model(api_type, api_version, deployment_name)
+        load_model(api_type, api_version, api_base, api_key, deployment_name)
 
         # Execute Gradio App
         run(port)
