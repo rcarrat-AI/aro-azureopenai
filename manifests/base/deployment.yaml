@@ -50,11 +50,21 @@ spec:
                 configMapKeyRef:
                   name: azureopenai-config
                   key: port
-            - name: model_name_or_path
+            - name: deployment_name
               valueFrom:
                 configMapKeyRef:
                   name: azureopenai-config
-                  key: model_name_or_path
+                  key: deployment_name
+            - name: api_type
+              valueFrom:
+                configMapKeyRef:
+                  name: azureopenai-config
+                  key: api_type
+            - name: api_version
+              valueFrom:
+                configMapKeyRef:
+                  name: azureopenai-config
+                  key: api_version
             - name: base_url
               valueFrom:
                 secretKeyRef:
