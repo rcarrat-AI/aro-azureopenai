@@ -11,12 +11,6 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 # Model Global Variable
 model = None
 
-# Only for development
-openai.api_type = "azure"
-openai.api_version = "2023-05-15"
-openai.api_base = os.getenv("OPENAI_API_BASE")
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
 #log details
 openai.log='debug'
 
@@ -41,25 +35,13 @@ def load_model(api_type, api_version, api_base, api_key, deployment_name):
         # Callbacks support token-wise streaming
         callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
         logging.info(f"Preparing model")
-        # Checking if openai.api_base and openai.api_key are defined and not empty
-        if hasattr(openai, 'api_base') and openai.api_base and hasattr(openai, 'api_key') and openai.api_key:
-            model = AzureChatOpenAI(
-                openai_api_base=openai.api_base,
-                openai_api_version=api_version,
-                deployment_name=deployment_name,
-                openai_api_key=openai.api_key,
-                openai_api_type=api_type,
-            )
-        else:
-            # If openai.api_base or openai.api_key is not defined or empty, use api_base and api_key variables
-            model = AzureChatOpenAI(
-                openai_api_base=api_base,
-                openai_api_version=api_version,
-                deployment_name=deployment_name,
-                openai_api_key=api_key,
-                openai_api_type=api_type,
-            )
-        
+        model = AzureChatOpenAI(
+            openai_api_base=api_base,
+            openai_api_version=api_version,
+            deployment_name=deployment_name,
+            openai_api_key=api_key,
+            openai_api_type=api_type,
+        )
         return model
     except Exception as e:
         logging.error(f"Error loading model: {str(e)}")
