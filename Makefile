@@ -1,9 +1,9 @@
 all: build tag push
 
-NAME=k8s-llama2-gpu
+NAME=aro-azureopenai
 VERSION=v1
 REGISTRY="quay.io/rcarrata"
-TOOL="docker"
+TOOL="podman"
 
 build: 
 	@${TOOL} build -t localhost/${NAME}:${VERSION} .
