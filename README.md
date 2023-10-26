@@ -31,8 +31,8 @@ metadata:
   name: azure-openai
 type: Opaque
 data:
-  api_base: $(echo -n "$api_base" | base64)
-  api_key: $(echo -n "$api_key" | base64)
+  OPENAI_API_BASE: $(echo -n "$api_base" | base64)
+  OPENAI_API_KEY: $(echo -n "$api_key" | base64)
 EOF
 ```
 
