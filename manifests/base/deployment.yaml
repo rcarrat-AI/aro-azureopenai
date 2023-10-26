@@ -55,3 +55,13 @@ spec:
                 configMapKeyRef:
                   name: azureopenai-config
                   key: model_name_or_path
+            - name: base_url
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai
+                  key: base_url
+            - name: api_key
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai
+                  key: api_key

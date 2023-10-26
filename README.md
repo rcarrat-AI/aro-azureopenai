@@ -1,14 +1,17 @@
 # Azure OpenAI ARO Application
 
-Repository for Deploy A Gradio App with Azure OpenAI as a backend LLM
+Repository for Deploy A Gradio App with Azure OpenAI as a backend LLM within Azure Red Hat OpenShift (ARO) cluster.
 
-## Usage
+![Azure OpenAI App within ARO Cluster](./assets/aro-azureopenai.png)
+
+## Add Azure OpenAI credentials into Kubernetes secrets
 
 * First, set your environment variables with the plain text values in your terminal:
 
 ```md
-export BASE_URL="https://MY_FANCY_URL.openai.azure.com/"
-export API_KEY="your-api-key"
+export base_url="https://MY_FANCY_URL.openai.azure.com/"
+export api_key="your-api-key"
+export namespace="aro-azureopenai"
 ```
 
 * create a Secret YAML file with base64-encoded values using echo and base64:
@@ -21,8 +24,16 @@ echo -n "$API_KEY" | base64
 * Deploy the secret in the namespace
 
 ```md
-envsubst < manifests/overlays/secret.yaml > /tmp/k8s-aoiaro-secret.yaml
-kubectl apply -n -f /tmp/k8s-aoiaro-secret.yaml
+cat <<EOF | kubectl apply -n $NAMESPACE -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: azure-openai
+type: Opaque
+data:
+  base_url: $(echo -n "$base_url" | base64)
+  api_key: $(echo -n "$api_key" | base64)
+EOF
 ```
 
 ## Local Development
