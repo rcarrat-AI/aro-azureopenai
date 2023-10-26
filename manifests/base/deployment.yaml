@@ -65,11 +65,11 @@ spec:
                 configMapKeyRef:
                   name: azureopenai-config
                   key: api_version
-            - name: base_url
+            - name: api_base
               valueFrom:
                 secretKeyRef:
                   name: azure-openai
-                  key: base_url
+                  key: api_base
             - name: api_key
               valueFrom:
                 secretKeyRef:

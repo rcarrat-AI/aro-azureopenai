@@ -9,7 +9,7 @@ Repository for Deploy A Gradio App with Azure OpenAI as a backend LLM within Azu
 * First, set your environment variables with the plain text values in your terminal:
 
 ```md
-export base_url="https://MY_FANCY_URL.openai.azure.com/"
+export api_base="https://MY_FANCY_URL.openai.azure.com/"
 export api_key="your-api-key"
 export namespace="aro-azureopenai"
 ```
@@ -24,14 +24,14 @@ echo -n "$API_KEY" | base64
 * Deploy the secret in the namespace
 
 ```md
-cat <<EOF | kubectl apply -n $NAMESPACE -f -
+cat <<EOF | kubectl apply -n $namespace -f -
 apiVersion: v1
 kind: Secret
 metadata:
   name: azure-openai
 type: Opaque
 data:
-  base_url: $(echo -n "$base_url" | base64)
+  api_base: $(echo -n "$api_base" | base64)
   api_key: $(echo -n "$api_key" | base64)
 EOF
 ```
