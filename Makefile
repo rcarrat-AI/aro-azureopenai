@@ -1,17 +1,17 @@
 all: build tag push
 
 NAME=aro-azureopenai
-VERSION=v1
+VERSION=v2
 REGISTRY="quay.io/rcarrata"
 TOOL="podman"
 
-build: 
+build:
 	@${TOOL} build -t localhost/${NAME}:${VERSION} .
-	
+
 tag:
 	@${TOOL} tag localhost/${NAME}:${VERSION} ${REGISTRY}/${NAME}:${VERSION}
 
-push: 
+push:
 	@${TOOL} push ${REGISTRY}/${NAME}:${VERSION}
 
 run:

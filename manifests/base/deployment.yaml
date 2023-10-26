@@ -18,7 +18,7 @@ spec:
         app: aro-azureopenai
     spec:
       containers:
-        - image: quay.io/rcarrata/aro-azureopenai:v1
+        - image: quay.io/rcarrata/aro-azureopenai:v2
           name: aro-azureopenai
           ports:
             - containerPort: 8080
