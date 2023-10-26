@@ -1,0 +1,17 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: aro-azureopenai
+  namespace: aro-azureopenai
+  labels:
+    app: aro-azureopenai
+spec:
+  to:
+    kind: Service
+    name: aro-azureopenai-svc
+    weight: 100
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+  wildcardPolicy: None

@@ -4,35 +4,38 @@ Repository for Deploy A Gradio App with Azure OpenAI as a backend LLM within Azu
 
 ![Azure OpenAI App within ARO Cluster](./assets/aro-azureopenai.png)
 
+![Azure OpenAI App within ARO Cluster - 2](./assets/aro-azureopenai-2.png)
+
+## Deploy FrontEnd App that uses Azure OpenAI
+
+```md
+kubectl apply -k manifests/overlays/ocp
+```
+
+NOTE: Use ```kubectl apply -k manifests/overlays/k8s``` if you want to deploy it in Vanilla K8s
+
 ## Add Azure OpenAI credentials into Kubernetes secrets
 
 * First, set your environment variables with the plain text values in your terminal:
 
 ```md
-export api_base="https://MY_FANCY_URL.openai.azure.com/"
-export api_key="your-api-key"
-export namespace="aro-azureopenai"
-```
-
-* create a Secret YAML file with base64-encoded values using echo and base64:
-
-```md
-echo -n "$BASE_URL" | base64
-echo -n "$API_KEY" | base64
+export OPENAI_API_BASE="https://MY_FANCY_URL.openai.azure.com/"
+export OPENAI_API_KEY="your-api-key"
+export NAMESPACE="aro-azureopenai"
 ```
 
 * Deploy the secret in the namespace
 
 ```md
-cat <<EOF | kubectl apply -n $namespace -f -
+cat <<EOF | kubectl apply -n $NAMESPACE -f -
 apiVersion: v1
 kind: Secret
 metadata:
   name: azure-openai
 type: Opaque
 data:
-  OPENAI_API_BASE: $(echo -n "$api_base" | base64)
-  OPENAI_API_KEY: $(echo -n "$api_key" | base64)
+  OPENAI_API_BASE: $(echo -n "$OPENAI_API_BASE" | base64)
+  OPENAI_API_KEY: $(echo -n "$OPENAI_API_KEY" | base64)
 EOF
 ```
 
