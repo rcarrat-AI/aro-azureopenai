@@ -31,6 +31,7 @@ def load_config():
     return config
 
 # Load the Azure OpenAI Model using LangChain
+# TODO: Add variable to control temperature
 def load_model(api_type, api_version, deployment_name):
     global model  # Declare that you are using the global model variable
     try:

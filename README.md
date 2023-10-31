@@ -2,9 +2,21 @@
 
 Repository for Deploy A Gradio App with Azure OpenAI as a backend LLM within Azure Red Hat OpenShift (ARO) cluster.
 
-![Azure OpenAI App within ARO Cluster](./assets/aro-azureopenai.png)
+![Azure OpenAI App within ARO Cluster - 0](./assets/aro-azureopenai-0.png)
+
+* FrontEnd App deployed in ARO
+
+![Azure OpenAI App within ARO Cluster 0 ](./assets/aro-azureopenai.png)
+
+* The FrontEnd uses Azure OpenAI GPT model as a Large Language Model Backend
 
 ![Azure OpenAI App within ARO Cluster - 2](./assets/aro-azureopenai-2.png)
+
+* Azure OpenAI GPT Backend is deployed in Azure:
+
+![Azure OpenAI App within ARO Cluster - 3](./assets/aro-azureopenai-3.png)
+
+NOTE: The model used in Azure OpenAI is the GPT-3.5 Turbo, which can be changed to utilize other models such as GPT-4.
 
 ## Deploy FrontEnd App that uses Azure OpenAI
 
