@@ -4,7 +4,7 @@ metadata:
   name: azureopenai-config
 data:
   title: "Azure OpenAI App running in Azure Red Hat OpenShift"
-  description: "Azure OpenAI App running in Azure Red Hat OpenShift"
+  description: "Created & Maintained by Roberto Carratalá @ Red Hat"
   port: "8080"
   deployment_name: "gpt-35-turbo"
   api_type: "azure"

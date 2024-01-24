@@ -18,6 +18,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 #log details
 openai.log='debug'
 
+# Load Config
 def load_config():
     config = {
         "title": os.getenv("title", "Azure OpenAI App running in Azure Red Hat OpenShift"),
@@ -31,7 +32,7 @@ def load_config():
     return config
 
 # Load the Azure OpenAI Model using LangChain
-# TODO: Add variable to control temperature
+# TODO: Add variable to control temperature, max_tokens, top_p, and frequency_penalty
 def load_model(api_type, api_version, deployment_name):
     global model  # Declare that you are using the global model variable
     try:
@@ -51,6 +52,7 @@ def load_model(api_type, api_version, deployment_name):
         logging.error(f"Error loading model: {str(e)}")
         raise
 
+# Create a predict function that takes in a message as input and outputs a prediction.
 def predict(message, history):
     global model
     if model is None:
@@ -88,6 +90,7 @@ def run(port):
         logging.error(f"Error running Gradio interface: {str(e)}")
         raise
 
+# Main
 if __name__ == "__main__":
     try:
         # Load Config
@@ -95,7 +98,7 @@ if __name__ == "__main__":
 
         # Extract configuration variables
         title = config.get("title", "Azure OpenAI App running in Azure Red Hat OpenShift")
-        description = config.get("description", "Azure OpenAI App running in Azure Red Hat OpenShift")
+        description = config.get("description", "Created & Maintained by Roberto Carratalá @ Red Hat")
         port = config.get("port", 8080)
         deployment_name = config.get("deployment_name", "gpt-35-turbo")
         api_type = config.get("api_type", "azure")
